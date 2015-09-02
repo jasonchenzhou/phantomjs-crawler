@@ -69,7 +69,7 @@ page.open("http://www.cbc.ca/news/politics/federal-leaders-focus-on-pledges-to-h
                     return false;
             });
         }, function() {
-           console.log("The sign-in dialog should be visible now.");
+           console.log("Parse finished");
            phantom.exit();
         });        
       //  });
