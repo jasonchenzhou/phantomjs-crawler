@@ -37,7 +37,81 @@ function waitFor(testFx, onReady, timeOutMillis) {
 var page = require('webpage').create();
 //var cheerio = require('cheerio');
 
+
+page.open("http://www.cbc.ca/news/politics", function(status){
+    if(status !== "success"){
+        console.log("Unable to access network");
+    }else{
+        var res = page.evaluate(function(){        //should return here!!!!!
+            var links = [];
+            var tem = document.getElementsByClassName("pinnableHref");
+            //console.log(document.getElementsByClassName("pinnableHref")[0].href;
+            for(var i=0; i<tem.length; i++){
+                console.log(tem[i].href);
+                links.push(tem[i].href);
+            } 
+            return links;
+        });
+        
+        for(var i=0; i<res.length; i++){
+            console.log(res[i]); 
+            parseOnePage(String(res[0]));   
+        }
+        //parseOnePage(String(res[0])); 
+     //   parseOnePage(String(res[1]));
+        //phantom.exit();
+    }
+});
+
+
+//parseOnePage("http://www.cbc.ca/news/politics/canada-election-2015-harper-mining-recession-1.3212476");
+
+function parseOnePage(url){
+    console.log("~~~~~~~~~~~~~~~~~~");
+    console.log(url);
+    page.open(url, function (status) {
+    // Check for page load success
+    if (status !== "success") {
+        console.log("Unable to access network");
+    } else {
+      //  page.injectJs('http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js', function() {
+console.log("11");
+
+        waitFor(function() {
+            page.viewportSize = {width: 4800,height: 80000};
+            // Check in the page if a specific element is now visible
+
+
+
+            return page.evaluate(function() {
+                console.log("22");
+                if(document.getElementsByClassName("vf-comment-thread").length >= 1){
+                   // var res = [];
+                    var cmts = [];
+                    //return document.getElementsByClassName("vf-comment-html")[0].textContent;
+                    var title = document.getElementsByClassName("story-title").textContent;
+                    var comments = document.getElementsByClassName("vf-comment-html");
+                    for(var i=0; i<comments.length; i++){
+                        cmts.push(comments[i].textContent);
+                    }
+                    return{
+                        title: title,
+                        comments: cmts
+                    } 
+                }else
+                    return false;
+            });
+        }, function() {
+           console.log("Parse finished");
+           //phantom.exit();
+        });        
+      //  });
+    }
+    });
+}
+
 // Open Twitter on 'sencha' profile and, onPageLoad, do...
+/*
 page.open("http://www.cbc.ca/news/politics/federal-leaders-focus-on-pledges-to-help-canadian-families-1.3197398", function (status) {
     // Check for page load success
     if (status !== "success") {
@@ -74,4 +148,4 @@ page.open("http://www.cbc.ca/news/politics/federal-leaders-focus-on-pledges-to-h
         });        
       //  });
     }
-});
+});  */
