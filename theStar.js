@@ -1,13 +1,36 @@
+var page = require('webpage').create();
+
 function waitFor(testFx, onReady, timeOutMillis) {
     var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 8000, 
         start = new Date().getTime(),
         condition = false,
         interval = setInterval(function() {
             if ( (new Date().getTime() - start < maxtimeOutMillis) && !condition ) {
-                var res = testFx();
-                if(res !=false){
-                    console.log("title: " + res.title);
+                var rect = testFx();
+                if(rect !=false){
+
+                    page.sendEvent('click', rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    var res = page.evaluate(function() {
+
+                        var cmts = [];
+                        var title = document.getElementsByClassName("article-headline")[0].getElementsByTagName("h1")[0].textContent;
+                        var comments = document.getElementsByClassName("vf-comment-html");
+                        for(var i=0; i<comments.length; i++){
+                            cmts.push(comments[i].innerHTML);
+                        }
+                        return{
+                            title: title,
+                            comments: cmts
+                        } 
+                        //return document.getElementsByClassName("vf-comment-html")[0];
+
+                    });
+                    console.log(res.title);
                     console.log(res.comments);
+                    //console.log(res.width);
+                    //console.log("title: " + res.title);
+                    //console.log(res.comments);
+               
                 }
                 condition = (res !== false);
             } else {
@@ -17,7 +40,7 @@ function waitFor(testFx, onReady, timeOutMillis) {
                 } else {
                     typeof(onReady) === "string" ? eval(onReady) : onReady(); //< Do what it's supposed to do once the condition is fulfilled
                     clearInterval(interval); //< Stop this interval
-                }
+                } 
             }
         }, 2000); 
 };
@@ -25,7 +48,7 @@ function waitFor(testFx, onReady, timeOutMillis) {
 
 
 
-var page = require('webpage').create();
+
 
 
 page.open("http://www.thestar.com/news/federal-election.html", function(status){
@@ -57,8 +80,8 @@ page.open("http://www.thestar.com/news/federal-election.html", function(status){
         }
 
 
-       // parseOnePage(res[3]);
-/*
+     //   parseOnePage(res[3]);
+
         var busy = false;
         var i = 0;
         var process = setInterval(function(){
@@ -70,11 +93,11 @@ page.open("http://www.thestar.com/news/federal-election.html", function(status){
                 if(++i === res.length) clearInterval(process);
                 busy = false;
             }
-        }, 5000);   */
+        }, 5000);   
     }
 });
 
-/*
+
 function parseOnePage(url){
     console.log("start parse " + url);
     page.open(url, function (status) {
@@ -89,7 +112,7 @@ console.log("here!!");
                 if(document.getElementsByClassName("show_comments_link").length >= 1){
                   //  var button = document.getElementsByClassName("show_comments_link");
                   //  button.click();
-console.log("11");
+//console.log("11");
                     var btn = document.getElementsByClassName("show_comments_link")[0].getBoundingClientRect();
                     return btn;
                   //  page.sendEvent('click', rect.left + rect.width / 2, rect.top + rect.height / 2);
@@ -110,15 +133,18 @@ console.log("11");
                         title: title,
                         comments: cmts
                     } 
- 
+ */
                 }else
                     return false;  
             });
         }, function(rect) {           //get things here!!!!
            // console.log()
+        /*   console.log(res.width);
+           console.log("~~~~~~~~~~~~~~");
+           console.log(res.height);  */
            console.log("finishe parse " + url);
 
         });        
     }
     });
-}*/
+}
